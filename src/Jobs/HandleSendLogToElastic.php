@@ -50,14 +50,13 @@ class HandleSendLogToElastic implements ShouldQueue
      */
     public function handle(): void
     {
-        $dateTime = new DateTime();
         $params = [
             'index' => $this->elasticIndex,
             'body' => [
                 'level' => $this->data['level'],
                 'message' => $this->data['message'],
                 'context' => $this->data['context'],
-                'datetime' => $dateTime->format('Y-m-d H:i:s.u')
+                'datetime' => $this->data['dateTime']->format('Y-m-d H:i:s.u')
             ],
         ];
         try {

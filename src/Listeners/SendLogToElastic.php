@@ -2,6 +2,7 @@
 
 namespace Outl1ne\LaravelElasticLogger\Listeners;
 
+use DateTime;
 use Outl1ne\LaravelElasticLogger\Jobs\HandleSendLogToElastic;
 use Illuminate\Log\Events\MessageLogged;
 
@@ -24,11 +25,13 @@ class SendLogToElastic
      */
     public function handle(MessageLogged $event): void
     {
+        $dateTime = new DateTime();
         if (array_key_exists('exception', $event->context)) {
             $exception = $event->context['exception'];
             $logData = [
                 'message' => $event->message,
                 'level' => $event->level,
+                'datetime' => $dateTime,
                 'context' => [
                     'exception_type' => get_class($exception),
                     'exception_message' => $exception->getMessage(),
@@ -40,6 +43,7 @@ class SendLogToElastic
             $logData = [
                 'message' => $event->message,
                 'level' => $event->level,
+                'datetime' => $dateTime,
                 'context' => $event->context
             ];
         }
