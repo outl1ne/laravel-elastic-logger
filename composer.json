@@ -1,6 +1,6 @@
 {
     "name": "outl1ne/laravel-elastic-logger",
-    "description": "Laravel logging to Elastic cloud with scheduler",
+    "description": "Laravel Elastic Cloud logging for MessageLogged event.",
     "keywords": [
         "laravel",
         "elastic"

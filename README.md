@@ -16,6 +16,33 @@ ___
 ```
 ___
 
+## Important notice
+
+This package implements the queueable job logic.
+
+Laravel also provides before and after functionality for jobs.
+
+You may want to log your jobs running.
+
+Maybe like this: 
+```        
+Queue::before(function (JobProcessing $event) {
+    Log::info('Starting job: ' . $event->job->resolveName() . ' with id ' . $event->job->getJobId());
+});
+```
+
+That is a bad idea as we are listening to **ALL** MessageLogged events.
+
+It will cause infinite loop of logs in your application. Feel free to create a pull request to solve this.
+
+#### In general be careful about the possibility of log loops.
+
+Tested with redis and database with queues running with ``php artisan queue:work`` or ``queue:listen``. 
+
+If you're working on Google cloud, consider setting up [stackkits laravel-google-cloud-tasks-queue](https://github.com/stackkit/laravel-google-cloud-tasks-queue)
+
+___
+
 ## Installation
 
 Install package
