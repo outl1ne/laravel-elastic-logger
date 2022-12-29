@@ -1,0 +1,27 @@
+{
+    "name": "outl1ne/laravel-elastic-logger",
+    "description": "Laravel logging to Elastic cloud with scheduler",
+    "keywords": [
+        "laravel",
+        "elastic"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Richard Raadi",
+            "email": "richard@out1ne.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "laravel/framework": "^9.0",
+        "elasticsearch/elasticsearch": "^8.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Outl1ne\\LaravelElasticLogger\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
