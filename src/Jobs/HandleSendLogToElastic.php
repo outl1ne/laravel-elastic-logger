@@ -56,7 +56,7 @@ class HandleSendLogToElastic implements ShouldQueue
                 'level' => $this->data['level'],
                 'message' => $this->data['message'],
                 'context' => $this->data['context'],
-                'datetime' => $this->data['dateTime']->format('Y-m-d H:i:s.u')
+                'datetime' => $this->data['datetime']->format('Y-m-d H:i:s.u')
             ],
         ];
         try {
