@@ -6,8 +6,8 @@ It will listen to all Log events and will also handle exceptions separately.
 ___
 ### Requirements
 ```json
-- PHP >=8.0
-- laravel/framework ^9.0
+PHP >=8.0
+laravel/framework ^9.0
 ```
 
 ### Dependencies

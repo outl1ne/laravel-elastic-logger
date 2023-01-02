@@ -6,7 +6,7 @@ use DateTime;
 use Outl1ne\LaravelElasticLogger\Jobs\HandleSendLogToElastic;
 use Illuminate\Log\Events\MessageLogged;
 
-class SendLogToElastic
+class PrepareLogPayload
 {
     /**
      * Create the event listener.

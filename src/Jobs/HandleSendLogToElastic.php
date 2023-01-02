@@ -2,7 +2,6 @@
 
 namespace Outl1ne\LaravelElasticLogger\Jobs;
 
-use DateTime;
 use Elastic\Elasticsearch\ClientBuilder;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -50,17 +49,16 @@ class HandleSendLogToElastic implements ShouldQueue
      */
     public function handle(): void
     {
-        $params = [
-            'index' => $this->elasticIndex,
-            'body' => [
-                'level' => $this->data['level'],
-                'message' => $this->data['message'],
-                'context' => $this->data['context'],
-                'datetime' => $this->data['datetime']->format('Y-m-d H:i:s.u')
-            ],
-        ];
         try {
-            $this->getClient()->index($params);
+            $this->getClient()->index([
+                'index' => $this->elasticIndex,
+                'body' => [
+                    'level' => $this->data['level'],
+                    'message' => $this->data['message'],
+                    'context' => $this->data['context'],
+                    'datetime' => $this->data['datetime']->format('Y-m-d H:i:s.u')
+                ],
+            ]);
         } catch (AuthenticationException|ServerResponseException|MissingParameterException|ClientResponseException|Exception $e) {
             // TODO - can't report as it will go into an infinite loop ::withoutEvents? maybe email
         }
