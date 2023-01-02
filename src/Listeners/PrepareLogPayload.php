@@ -8,6 +8,9 @@ use Illuminate\Log\Events\MessageLogged;
 
 class PrepareLogPayload
 {
+    /** @var string  */
+    private string $excludeLogLevels;
+
     /**
      * Create the event listener.
      *
@@ -15,6 +18,7 @@ class PrepareLogPayload
      */
     public function __construct()
     {
+        $this->excludeLogLevels = config('elastic_logging.elastic_exclude_levels');
     }
 
     /**
@@ -25,6 +29,9 @@ class PrepareLogPayload
      */
     public function handle(MessageLogged $event): void
     {
+        if(in_array($event->level, explode(',', $this->excludeLogLevels))){
+            return;
+        }
         $dateTime = new DateTime();
         if (array_key_exists('exception', $event->context)) {
             $exception = $event->context['exception'];
