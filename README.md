@@ -7,7 +7,7 @@ ___
 ### Requirements
 ```
 - PHP >=8.0
-- laravel/framework ^9.0
+- laravel/framework ^8.7 || ^9.0
 ```
 
 ### Dependencies
@@ -18,26 +18,11 @@ ___
 
 ## Important notice
 
-This package implements the queueable job logic.
-
-Laravel also provides before and after functionality for jobs.
-
-You may want to log your jobs running.
-
-Maybe like this: 
-```        
-Queue::before(function (JobProcessing $event) {
-    Log::info('Starting job: ' . $event->job->resolveName() . ' with id ' . $event->job->getJobId());
-});
-```
-
-That is a bad idea as we are listening to **ALL** MessageLogged events.
-
-It will cause infinite loop of logs in your application. Feel free to create a pull request to solve this.
+Do not log Queue::before / after events. This will cause an infinite loop of logging and will cause your application to crash.
 
 #### In general be careful about the possibility of log loops.
 
-Tested with redis and database with queues running with ``php artisan queue:work`` or ``queue:listen``. 
+Tested with redis and database queue drivers. 
 
 If you're working on Google cloud, consider setting up [stackkits laravel-google-cloud-tasks-queue](https://github.com/stackkit/laravel-google-cloud-tasks-queue)
 
@@ -48,17 +33,6 @@ ___
 Install package
 ```bash
 composer require outl1ne/laravel-elastic-logger
-```
-
-
-Add the package service provider to your Laravel app service provider
-```bash
-# config/app.php
-'providers' => [
-    ...
-    Outl1ne\LaravelElasticLogger\LaravelElasticLoggerServiceProvider::class,
-    ...
-],
 ```
 
 Configure the environment variables for the package
@@ -75,26 +49,15 @@ ___
 
 ## Cheat sheet / quick guide to set up Elastic.
 
-Elastic offers 14 day free trial. Following this guide you will be able to configure you application within 10 minutes to test out if this satisfies your needs.
+Elastic offers 14 day free trial.
+
+This package will auto-generate the indexes for you based on the ELASTIC_INDEX value.
+It will create indexes in the pattern of: `ELASTIC_INDEX + _ + d-m-Y`
 
 1. [Create an account](https://cloud.elastic.co)
 2. Create a new instance.
-3. Navigate to Management -> Dev Tools on the burger menu in your new instance.
-4. Paste this bare-bones template to make a new index. Important is to predefine the datetime in order for Kibana to know which field to use as a date sort.
-```
-PUT /your_index_name
-{
-"settings": {"number_of_shards": 1},"mappings": {"properties": {
-"context": {"properties": {"message": {"type": "text","fields": {
-"keyword": {"type": "keyword","ignore_above": 256}}}}},
-"datetime": {"type": "date","format": "yyyy-MM-dd HH:mm:ss.SSSSSS"},
-"level": {"type": "text","fields": {"keyword": {"type": "keyword","ignore_above": 256}}},
-"message": {"type": "text","fields": {"keyword": {"type": "keyword","ignore_above": 256}}}}}
-}
-```
-Datetime format is important here as it needs to match what the package sends out.
+3. Create a new Kibana Data view. Choose a name and match the index pattern with the index name you created. Kibana allows wildcards.
 
-5. Create a new Kibana Data view. Choose a name and match the index pattern with the index name you created. Kibana allows wildcards. IE: project_* for project_dev and project_prod for viewing both indexes on the same data view.
 ##### Choose the "datetime" field as the Timestamp field! This is important to allow convenient filtering based on the timestamp.
 
 Elastic is able to create a new index on the fly but you cannot change the datetime field for the timestamp later, which will result in not having a proper timestamp filter.
@@ -103,8 +66,7 @@ Save the data view and view your newly created data view in the "Discover" secti
 
 ___
 ## What the future brings
-* Log level handling - IE send only errors & debug logs.
-* In case Elastic API fails, it is currently not being handled.
+* lifecycle policy management
 
 ___
 ## License
