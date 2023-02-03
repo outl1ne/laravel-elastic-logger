@@ -25,9 +25,12 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Outl1ne\\LaravelElasticLogger\\EventServiceProvider"
+                "Outl1ne\\LaravelElasticLogger\\LaravelElasticLoggerServiceProvider"
             ]
         }
+    },
+    "config": {
+        "sort-packages": true
     },
     "minimum-stability": "dev",
     "prefer-stable": true
