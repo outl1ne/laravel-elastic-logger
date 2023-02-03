@@ -14,6 +14,7 @@ use Elastic\Elasticsearch\Exception\AuthenticationException;
 use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Exception\MissingParameterException;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Illuminate\Support\Facades\Cache;
 
 class HandleSendLogToElastic implements ShouldQueue
 {
@@ -49,9 +50,15 @@ class HandleSendLogToElastic implements ShouldQueue
      */
     public function handle(): void
     {
+        $indexName = $this->elasticIndex . '_' . $this->data['datetime']->format('d-m-Y');
+        $currentIndexNameCached = Cache::get('elastic_index_name');
+        if($currentIndexNameCached !== $indexName){
+            $this->createIndex($indexName);
+        }
+
         try {
             $this->getClient()->index([
-                'index' => $this->elasticIndex,
+                'index' => $indexName,
                 'body' => [
                     'level' => $this->data['level'],
                     'message' => $this->data['message'],
@@ -60,7 +67,7 @@ class HandleSendLogToElastic implements ShouldQueue
                 ],
             ]);
         } catch (AuthenticationException|ServerResponseException|MissingParameterException|ClientResponseException|Exception $e) {
-            // TODO - can't report as it will go into an infinite loop ::withoutEvents? maybe email
+            // Do nothing
         }
     }
 
@@ -73,5 +80,48 @@ class HandleSendLogToElastic implements ShouldQueue
             ->setElasticCloudId($this->elasticId)
             ->setApiKey($this->elasticApiKey)
             ->build();
+    }
+
+    private function createIndex(string $indexName): void
+    {
+        try {
+            $params = ['index' => $indexName];
+            // check if the index is already created, if we get 404, its not.
+            $this->getClient()->indices()->getSettings($params);
+        } catch (ClientResponseException $e) {
+            if ($e->getCode() === 404) {
+                $params = [
+                    'index' => $indexName,
+                    'body' => [
+                        'settings' => [
+                            'number_of_shards' => 1
+                        ],
+                        'mappings' => [
+                            'properties' => [
+                                'level' => [
+                                    'type' => 'keyword'
+                                ],
+                                'message' => [
+                                    'type' => 'text'
+                                ],
+                                'context' => [
+                                    'type' => 'object'
+                                ],
+                                'datetime' => [
+                                    'type' => 'date',
+                                    'format' => 'yyyy-MM-dd HH:mm:ss.SSSSSS'
+                                ]
+                            ]
+                        ]
+                    ]
+                ];
+                $response = $this->getClient()->indices()->create($params);
+                if($response->getStatusCode() === 200){
+                    Cache::put('current_elastic_index', $indexName, 86400);
+                }
+            }
+        } catch (AuthenticationException|ServerResponseException $e) {
+
+        }
     }
 }
