@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": ">=8.0",
-        "laravel/framework": "^8.7",
+        "laravel/framework": "^8.7 || ^9.0",
         "elasticsearch/elasticsearch": "^8.5"
     },
     "autoload": {
