@@ -42,6 +42,7 @@ ELASTIC_INDEX= # index where to send the logs
 ELASTIC_CLOUD_ID= # your elastic instance cloud ID
 ELASTIC_API_KEY= # your elastic API key
 ELASTIC_EXCLUDE_LOG_LEVELS= # comma separated log levels to be excluded, IE: "info,warning"
+ELASTIC_LIFECYCLE_POLICY= # lifecycle policy name for setting: body.settings.index.lifecycle.name. if not assigned not set.
 ```
 
 Make sure your [queue handler](https://laravel.com/docs/9.x/queues#driver-prerequisites) is configured properly
